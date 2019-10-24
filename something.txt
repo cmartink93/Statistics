@@ -1,0 +1,8 @@
+var	description
+~/Desktop/applied_regression/diamonds.csv	file path
+1	SLR(1) MLR(2)
+WEIGHT	x or predictor variables of data
+PRICE	y or response variable of data
+.55,.32,.44	list of new xh data 
+0.95	alpha
+~/Desktop/applied_regression/output.txt	outFile
