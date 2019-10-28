@@ -16,14 +16,13 @@ args <- read.table('something.txt',header = TRUE, sep = "\t")
   outTxt <- as.character(args$var[7])
   
   #SLR or MLR?
-  if(args$var[2]==1){
-    source('diagSLR.R')
-  }
+  if(args$var[2]==1){source('diagSLR.R')
+  } else {source('diagMLR.R')}
 
   #LR Summary
   sink(outTxt)
   print("Model Summary")
-  mSum <- getSummary(slrModel)
+  mSum <- getSummary(slrModel) #generalize for slr or mlr
   print(mSum)
   sink()
 
@@ -49,7 +48,7 @@ args <- read.table('something.txt',header = TRUE, sep = "\t")
   
   #diagnostics (plot)
   
-  pdf(str(args[7]) + "diagPlots.pdf") 
+  pdf("diagPlots.pdf") 
   diagPlots <- grid.arrange(scatPlot, resPlot, outlierPlot, normProbPlot, nrow = 2)
   dev.off()
   

@@ -1,7 +1,6 @@
 args <- read.table('something.txt',header = TRUE, sep = "\t")
 filePath <-as.character(args$var[1])
 csvData <- read.csv(filePath, header = TRUE)
-args <- read.table('something.txt',header = TRUE, sep = "\t")
 outTxt <- as.character(args$var[7])
 
 
@@ -24,7 +23,7 @@ getSummary <- function(slrModel){
                          c(b0,b1,b0_pval,b1_pval,summary(slrModel)$r.squared))
   return(slrSummaryTable)
 }
-
+tbl <- getSummary(slrModel)
 
 #predictions
 alpha <- as.numeric(as.character(args$var[6]))
@@ -37,24 +36,25 @@ xhPred <- predict(slrModel,setNames(xh_data,xDataName),interval='predict',level=
 
 
 #anova
+alpha=.05
 ei <- residuals(slrModel)
 nVal <- nrow(csvData)
 MSE <- sum(ei^2)/(nVal-2)
-SST <- sum((yData - mean(yData))^2)
+SST <- sum((yData[[1]] - mean(yData[[1]]))^2)
 SSE <- MSE*(nVal-2)
 SSR <- SST-SSE #here the SSR=MSR because df=1
 fStat <- SSR/MSE
-fHat <- qf(1-alpha, df1=1, df2=nVal-2) 
-anovaTable <- cbind(c("SSE","SSR","SST","df (SSR)", "df (SSE)","MSR","MSE","F-statistic"),
-                    c(SSE,SSR,SST,1,nVal-2,SSR,fStat))
+pfVal <- pf(1-alpha, df1=1, df2=nVal-2) 
+anovaTable <- cbind(c("SSE","SSR","SST","df (SSR)", "df (SSE)","MSR","MSE","F-statistic","P-Value"),
+                    c(SSE,SSR,SST,1,nVal-2,SSR,MSE,fStat,pfVal))
 #return(anovaTable)
 
 
 #diagnostics (numeric)
 
 shapiro <- shapiro.test(ei)[2]
-med <- median(xData) 
-group <- xData <= med
+med <- median(xData[[1]]) 
+group <- xData[[1]] <= med
 levene <- levene.test(ei,group)[2]
 numericTable <- cbind(c("Shapiro","Levene"),c(shapiro,levene))
 #small p value, not constant variance
@@ -77,7 +77,7 @@ outlierPlot <- ggplot(slrModel,aes(x=as.numeric(xData[[1]]),y=eStar))+
 normProbPlot <- ggplot(slrModel,aes(sample=ei))+stat_qq()+stat_qq_line()+
           ggtitle("Normal Probabilty Plot")
 
-
+grid.arrange(scatPlot, resPlot, outlierPlot, normProbPlot, nrow = 2)
 
 
 
